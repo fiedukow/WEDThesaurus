@@ -20,15 +20,11 @@ if (isset($_GET['q'])) {
   require_once("Zend/Search/Lucene.php");
   require_once("./synonyms_helper.php");
   $index = Zend_Search_Lucene::open('/LuceneIndex/WEDT_MAIN');
-//$query = Zend_Search_Lucene_Search_QueryParser::parse($_GET['q'].'~', 'utf-8');
-  $query = new Zend_Search_Lucene_Search_Query_Boolean();
   foreach(getWordsAndTheirSynonyms(explode(' ', $_GET['q'])) as $word) {
-      $query->addSubquery(
-          new Zend_Search_Lucene_Search_Query_Fuzzy(new Zend_Search_Lucene_Index_Term($word)));
-  }
-  $hits = $index->find($query);
-  foreach ($hits as $hit) {
-    $document = $hit->getDocument();
+    $query = Zend_Search_Lucene_Search_QueryParser::parse($word.'~', 'utf-8');
+    $hits = $index->find($query);
+    foreach ($hits as $hit) {
+      $document = $hit->getDocument();
 ?>
 <div class="result">
 <h1><a href="./display_result.php?q=<?php echo $_GET['q']; ?>&id=<?php echo $document->getFieldValue('id'); ?>"><?php echo $document->getFieldValue('title'); ?></a></h1>
@@ -36,6 +32,7 @@ if (isset($_GET['q'])) {
 <p><?php echo $document->getFieldValue('shortcut').' (...)'; ?></p>
 </div>
 <?php
+    }
   }
 }
 ?>
