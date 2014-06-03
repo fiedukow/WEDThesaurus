@@ -20,11 +20,17 @@ if (isset($_GET['q'])) {
   require_once("Zend/Search/Lucene.php");
   require_once("./synonyms_helper.php");
   $index = Zend_Search_Lucene::open('/LuceneIndex/WEDT_MAIN');
-  foreach(getWordsAndTheirSynonyms(explode(' ', $_GET['q'])) as $word) {
+  $founded = array();
+  $words = getWordsAndTheirSynonyms(explode(' ', $_GET['q']));
+  foreach($words as $word) {
     $query = Zend_Search_Lucene_Search_QueryParser::parse($word.'~', 'utf-8');
     $hits = $index->find($query);
     foreach ($hits as $hit) {
       $document = $hit->getDocument();
+      if (in_array($document->getFieldValue("id"), $founded))
+        continue;
+      else
+        array_push($founded, $document->getFieldValue("id"));
 ?>
 <div class="result">
 <h1><a href="./display_result.php?q=<?php echo $_GET['q']; ?>&id=<?php echo $document->getFieldValue('id'); ?>"><?php echo $document->getFieldValue('title'); ?></a></h1>

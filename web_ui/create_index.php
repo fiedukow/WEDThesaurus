@@ -19,6 +19,7 @@ while($row=mysql_fetch_array($result)) {
   $doc->addField(Zend_Search_Lucene_Field::unStored('text', $row['text'], 'utf-8'));
   $index->addDocument($doc);
 }
+$index->optimize();
 echo "</ul>\n";
 mysql_close($sql_conn);
 
