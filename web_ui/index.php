@@ -42,13 +42,15 @@ if (isset($_GET['q'])) {
   $url .= "&s_id=".$word["syn_id"];
 ?>
 <h1><a href="<?php echo $url; ?>"><?php echo $document->getFieldValue('title'); ?></a></h1>
-<?php if ($word["syn_id"] > 0 && !$did_you_mean_displayed) {
+<?php if (!$did_you_mean_displayed) {
         //$did_you_mean_displayed = true;
 ?>
 <hr>
   <p>Did you mean <strong><?php echo $word["syn"]; ?></strong>
-     by <strong><?php echo $word["reason"]; ?>?</strong>
-     [<em><?php echo $word["qual"]*100; ?>%</em>]</p>
+<?php if ($word["syn"] != $word["reason"]) { ?>
+     by <strong><?php echo $word["reason"]; ?></strong>
+<?php } ?>
+     ? [<em><?php echo round($word["qual"]*100); ?>%</em>]</p>
 <?php } ?>
 <hr>
 <p><?php echo $document->getFieldValue('shortcut').' (...)'; ?></p>

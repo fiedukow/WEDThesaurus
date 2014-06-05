@@ -11,6 +11,10 @@
 <div id="search_results">
 <?php
 if (isset($_GET['t_id'])) {
+  if ($_GET['w_id'] != -1 && $_GET['s_id'] != -1) {
+    require_once("synonyms_helper.php");
+    selectedSynonym($_GET['w_id'], $_GET['s_id']);
+  }
   $sql_conn = mysql_connect('localhost', 'root', 'toor');
   mysql_select_db('WEDT');
   mysql_query("SET NAMES utf8");
