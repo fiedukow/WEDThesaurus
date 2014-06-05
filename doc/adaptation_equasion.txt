@@ -1,0 +1,18 @@
+Q(w, s) = Q_{base}(w, s) \times Q_{click}(w, s) \\
+\\
+\\
+Q_{click}(w, s) =
+\dfrac{Clicks(w, s) + C}
+      {
+         \dfrac{1}{\left | S_w \right |}
+         \sum\limits_{ \sigma \in S_w}
+         {(Clicks(w, \sigma) + C)}}
+\\
+\\
+\\
+Q(w, s) - \text{Quality of synonym \emph{s} for word \emph{w}} \\
+Q_{base}(w, s) \in [0, 1] \ - \ \text{Base quality of synonym \emph{s} for word \emph{w} from preprocessing} \\
+Clicks(w, s)\  -\  \text{Number of times user choosed result based on synononym \emph{s} while searching for \emph{w}}\\
+S_w - \text{Set of synonyms connected with word \emph{w}} \\
+C - \text{constant value used to get smooth startup and to get rid of zeros problem}
+
