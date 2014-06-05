@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Jun 03, 2014 at 10:11 PM
+-- Generation Time: Jun 05, 2014 at 11:00 PM
 -- Server version: 5.5.37-1
 -- PHP Version: 5.5.7
 
@@ -36,10 +36,11 @@ CREATE TABLE IF NOT EXISTS `synonyms` (
   `word_id` int(11) NOT NULL,
   `literal_id` int(11) NOT NULL,
   `quality` decimal(6,5) NOT NULL,
+  `display_count` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`word_id`,`literal_id`),
   KEY `literal_id` (`literal_id`),
   KEY `word_id` (`word_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8_polish_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -52,7 +53,7 @@ CREATE TABLE IF NOT EXISTS `texts` (
   `title` varchar(64) COLLATE utf8mb4_polish_ci NOT NULL,
   `text` text COLLATE utf8mb4_polish_ci NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_polish_ci AUTO_INCREMENT=5 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_polish_ci AUTO_INCREMENT=100 ;
 
 -- --------------------------------------------------------
 
@@ -83,4 +84,3 @@ ALTER TABLE `synonyms`
 --
 ALTER TABLE `words`
   ADD CONSTRAINT `words_literals_id` FOREIGN KEY (`literal_id`) REFERENCES `literals` (`id`);
-
