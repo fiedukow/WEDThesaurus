@@ -23,8 +23,9 @@ if (isset($_GET['q'])) {
   $founded = array();
   $words = getWordsAndTheirSynonyms(explode(' ', $_GET['q']));
   foreach($words as $word) {
-    $query = Zend_Search_Lucene_Search_QueryParser::parse($word.'~', 'utf-8');
+    $query = Zend_Search_Lucene_Search_QueryParser::parse($word["syn"].'~', 'utf-8');
     $hits = $index->find($query);
+    $did_you_mean_displayed = false;
     foreach ($hits as $hit) {
       $document = $hit->getDocument();
       if (in_array($document->getFieldValue("id"), $founded))
@@ -33,7 +34,22 @@ if (isset($_GET['q'])) {
         array_push($founded, $document->getFieldValue("id"));
 ?>
 <div class="result">
-<h1><a href="./display_result.php?q=<?php echo $_GET['q']; ?>&id=<?php echo $document->getFieldValue('id'); ?>"><?php echo $document->getFieldValue('title'); ?></a></h1>
+<?php
+  $url  = "./display_result.php";
+  $url .= "?q=".$_GET['q'];
+  $url .= "&t_id=".$document->getFieldValue('id');
+  $url .= "&w_id=".$word["reason_id"];
+  $url .= "&s_id=".$word["syn_id"];
+?>
+<h1><a href="<?php echo $url; ?>"><?php echo $document->getFieldValue('title'); ?></a></h1>
+<?php if ($word["syn_id"] > 0 && !$did_you_mean_displayed) {
+        //$did_you_mean_displayed = true;
+?>
+<hr>
+  <p>Did you mean <strong><?php echo $word["syn"]; ?></strong>
+     by <strong><?php echo $word["reason"]; ?>?</strong>
+     [<em><?php echo $word["qual"]*100; ?>%</em>]</p>
+<?php } ?>
 <hr>
 <p><?php echo $document->getFieldValue('shortcut').' (...)'; ?></p>
 </div>

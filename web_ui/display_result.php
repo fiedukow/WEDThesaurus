@@ -10,11 +10,11 @@
 <body>
 <div id="search_results">
 <?php
-if (isset($_GET['id'])) {
+if (isset($_GET['t_id'])) {
   $sql_conn = mysql_connect('localhost', 'root', 'toor');
   mysql_select_db('WEDT');
   mysql_query("SET NAMES utf8");
-  $result = mysql_query("SELECT `id`, `title`, `text` FROM `texts` WHERE `id`='".$_GET['id']."'");
+  $result = mysql_query("SELECT `id`, `title`, `text` FROM `texts` WHERE `id`='".$_GET['t_id']."'");
   if ($row = mysql_fetch_array($result)) {
 ?>
 <div class="result">
