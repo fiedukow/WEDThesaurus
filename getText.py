@@ -119,7 +119,8 @@ def countDescriptionWords(descriptionList):
 			elif word == lastWord:
 				counter += 1
 			else:
-				description2.append((counter,lastWord))
+				if lastWord != 'be':
+					description2.append((counter,lastWord))
 				counter = 1
 				lastWord = word
 		descriptionList[key] = description2
@@ -213,13 +214,24 @@ for mainKey, mainDescription in mainWordsDescription.iteritems():
 	for allKey, allDescription in allWordsDescription.iteritems():
 		
 		value = 0
+		mainValue = 0
+		allValue = 0
 		if allKey == mainKey:
 			continue
+
+		for mainWordDesc in mainDescription:
+			mainValue += mainWordDesc[0]
+		for allWordDesc in allDescription:
+			allValue += allWordDesc[0]
 		for mainWordDesc in mainDescription:
 			for allWordDesc in allDescription:
 				if mainWordDesc[1] == allWordDesc[1]:
 					value += mainWordDesc[0] * allWordDesc[0]
-		tmpSynonym.append((value,allKey))			
+		if allValue * mainValue != 0:			
+			tmpSynonym.append((float(value)/(allValue*mainValue),allKey))	
+			print 	(float(value)/(allValue*mainValue),allKey)
+		else:
+			tmpSynonym.append((0,allKey))
 	tmpSynonym.sort(reverse=True)
 	for synonym in tmpSynonym[:3]:	
 		synonymList[mainKey].append(synonym)
