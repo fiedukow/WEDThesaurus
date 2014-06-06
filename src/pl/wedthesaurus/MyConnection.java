@@ -9,7 +9,7 @@ import java.sql.Statement;
 public class MyConnection
 {
     private final static String DBURL = "jdbc:mysql://127.0.0.1:3306/WEDT";
-    private final static String DBUSER = "user";
+    private final static String DBUSER = "root";
     private final static String DBPASS = "pass";
     private final static String DBDRIVER = "com.mysql.jdbc.Driver";
  

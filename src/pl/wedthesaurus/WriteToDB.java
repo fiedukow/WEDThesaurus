@@ -27,6 +27,7 @@ public class WriteToDB
 		int mainLiteralId = getLiteralId(mainWord);
 		int mainWordId = getWordId(mainLiteralId);
 		MyConnection connection = new MyConnection();
+		connection.executeUpdate("delete from synonyms;");
 		String[] synonyms = otherWords.split(",");
 		for (String sysnonymEntry : synonyms)
 		{
@@ -35,7 +36,7 @@ public class WriteToDB
 			String quality = sysnonymSplitEntry[1].substring(
 					0, sysnonymSplitEntry[1].length()-1);
 			int lteralId = getLiteralId(synonym);
-			connection.executeUpdate("INSERT INTO synonyms VALUES ("+mainWordId+", "+lteralId+", "+quality+");");
+			connection.executeUpdate("INSERT INTO synonyms VALUES ("+mainWordId+", "+lteralId+", "+quality+", 0);");
 		}
 		connection.close();
 	}
