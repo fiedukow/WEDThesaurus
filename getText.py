@@ -3,7 +3,8 @@
 import re
 import sys
 from collections import defaultdict
-
+from types import *
+import time
 mainWordConnection = []
 
 mainWordConnection.append('ncmod')
@@ -23,42 +24,46 @@ def splitToWords(wordNumberType):
 		return ('errPars','000')
 
 def parseSentence(sentence):
-	
-	wordPart = []
-	regEx = ur'\|(.+?)\|'
-	words = re.findall(regEx, sentence[0])
-	if len(words) > 0:
-		del words[-1]
 		
-		for word in words:
-			wordPart.append(splitToWords(word))
+        wordPart = []
+        regEx = ur'\|(.+?)\|'
+        words = re.findall(regEx, sentence[0])
+
+        if len(words) > 0:
+                ruleList = []
+                del words[-1]
+
+                for word in words:
+                        wordPart.append(splitToWords(word))
+
+                nouns = []
+
+                for onewp in wordPart:
+                        if onewp[1] == 'NN1' or onewp[1] == 'NN2':
+                                nouns.append(onewp[0])
+
+                del sentence[0]
+                del sentence[0]
+                for line in sentence:
+                        parts = re.findall(regEx, line)
+                        isNoun = False
+
+                        if parts[0] in mainWordConnection:
+                                tmpList = []
+                                tmpList.append(parts[0])
+                                for part in parts[1:]:
+                                        tmpInfo = splitToWords(part)
+                                        tmpList.append(tmpInfo)
+                                        if tmpInfo[1] == 'NN1' or tmpInfo[1] == 'NN2':    
+                                                isNoun = True
+                                if isNoun:
+                                        ruleList.append(tmpList)
+                return (wordPart, ruleList)
+        else:
+                ruleList = []
+                wordPart.append('parseError')
+                return (wordPart, ruleList)
 		
-	
-		nouns = []
-	
-		for onewp in wordPart:
-			if onewp[1] == 'NN1' or onewp[1] == 'NN2':
-				nouns.append(onewp[0])
-	
-		del sentence[0]
-		del sentence[0]
-		ruleList = []
-		for line in sentence:
-			parts = re.findall(regEx, line)
-			isNoun = False
-	
-			if parts[0] in mainWordConnection:
-				tmpList = []
-				tmpList.append(parts[0])
-				for part in parts[1:]:
-					tmpInfo = splitToWords(part)
-					tmpList.append(tmpInfo)
-					if tmpInfo[1] == 'NN1' or tmpInfo[1] == 'NN2':				
-						isNoun = True
-				if isNoun:
-					ruleList.append(tmpList)
-		return (wordPart, ruleList)
-				
 				
 def findDescription(mainWord, wordsDescription, makeList, allWordsDesc):		
 	mainLower = mainWord.lower()
@@ -119,8 +124,7 @@ def countDescriptionWords(descriptionList):
 			elif word == lastWord:
 				counter += 1
 			else:
-				if lastWord != 'be':
-					description2.append((counter,lastWord))
+				description2.append((counter,lastWord))
 				counter = 1
 				lastWord = word
 		descriptionList[key] = description2
@@ -156,13 +160,13 @@ for line in raspFile:
 		emptyLine = 1
 		continue
 	elif (line == '\n') and (emptyLine == 1):
-		parsedSentences.append(parseSentence(sentence))
+                tmpTuple = parseSentence(sentence)
+                if len(tmpTuple[0])>0:
+                        parsedSentences.append(tmpTuple)
 		sentence=[]
 		emptyLine = 0
 		continue
 	sentence.append(line.rstrip('\n'))
-
-
 
 
 
@@ -210,31 +214,35 @@ countDescriptionWords(allWordsDescription)
 tmpSynonym = []
 
 for mainKey, mainDescription in mainWordsDescription.iteritems():
-	tmpSynonym = []
-	for allKey, allDescription in allWordsDescription.iteritems():
-		
-		value = 0
-		mainValue = 0
-		allValue = 0
-		if allKey == mainKey:
-			continue
+        tmpSynonym = []
+        for allKey, allDescription in allWordsDescription.iteritems():
+                mainValue = 0
+                value = 0
+                valueAll = 0
+                allValue = 0
+                if allKey == mainKey:
+                        continue
+                for mainWordDesc in mainDescription:
+                        mainValue += mainWordDesc[0]
+                for allWordDesc in allDescription:
+                        allValue += allWordDesc[0]
+                for mainWordDesc in mainDescription:
+                        for allWordDesc in allDescription:
+                                if mainWordDesc[1] == allWordDesc[1]:
+                                        value += mainWordDesc[0] * allWordDesc[0]
+                                        valueAll += mainWordDesc[0] + allWordDesc[0]
 
-		for mainWordDesc in mainDescription:
-			mainValue += mainWordDesc[0]
-		for allWordDesc in allDescription:
-			allValue += allWordDesc[0]
-		for mainWordDesc in mainDescription:
-			for allWordDesc in allDescription:
-				if mainWordDesc[1] == allWordDesc[1]:
-					value += mainWordDesc[0] * allWordDesc[0]
-		if allValue * mainValue != 0:			
-			tmpSynonym.append((float(value)/(allValue*mainValue),allKey))	
-			print 	(float(value)/(allValue*mainValue),allKey)
-		else:
-			tmpSynonym.append((0,allKey))
-	tmpSynonym.sort(reverse=True)
-	for synonym in tmpSynonym[:3]:	
-		synonymList[mainKey].append(synonym)
+                if mainValue+allValue-valueAll != 0:
+                        noParam =float(valueAll)/(mainValue+allValue-valueAll)
+                        if allValue * mainValue != 0:
+                                tmpSynonym.append((float(value)/(allValue*mainValue)*noParam,allKey))
+                        else:
+                                tmpSynonym.append((0,allKey))
+                else:
+                        tmpSynonym.append((0,allKey))
+        tmpSynonym.sort(reverse=True)
+        for synonym in tmpSynonym[:3]:
+                synonymList[mainKey].append(synonym)
 
 synonymFile = open('synonym.output','w')
 synonymFile.write('')
@@ -242,16 +250,12 @@ synonymFile.close()
 synonymFile = open('synonym.output','a')
 
 for key, description in synonymList.iteritems():
-	line = str(key)+':'
-	for desc in description:
-		line+=str(desc[1])+'('+str(desc[0])+'),'
-	synonymFile.write(line[:len(line)-1]+'\n')
+        line = str(key)+':'
+        for desc in description:
+                line+=str(desc[1])+'('+str(desc[0])+'),'
+        synonymFile.write(line[:len(line)-1]+'\n')
 
 synonymFile.close()
-
-
-
-
 
 
 
